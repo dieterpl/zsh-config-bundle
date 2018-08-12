@@ -1,3 +1,5 @@
+![ps](https://github.com/dieterpl/prime-shell-bundle/raw/master/ps.png)
+
 Prime shell is a shell bundle based on oh-my-zsh for macOs. This is a complete ready to use bundle optimized for performance and usability. 
 
 # Features
