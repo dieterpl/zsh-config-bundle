@@ -1,4 +1,4 @@
-Prime shell is a macOS shell bundle based on oh-my-zsh. This is a complete ready to use shell bundle optimized for performance and usability. 
+Prime shell is a shell bundle based on oh-my-zsh for macOs. This is a complete ready to use bundle optimized for performance and usability. 
 
 # Features
 
