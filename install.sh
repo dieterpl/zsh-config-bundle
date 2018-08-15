@@ -58,7 +58,7 @@ colorPrint "Installing fzf ..."
 brew install fzf
 #$(brew --prefix)/opt/fzf/install < dev/null
 # Install oh-my-zsh
-export ZSH = ~/.oh-my-zsh
+export ZSH=~/.oh-my-zsh
 colorPrint "Installing oh-my-zsh ..."
 sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)" < /dev/null
 cp "$ZSH"/templates/zshrc.zsh-template ~/.zshrc
