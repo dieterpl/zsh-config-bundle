@@ -79,7 +79,7 @@ rm ~/tempfilezshrc
 echo "eval \"\$(fasd --init auto zsh-hook zsh-ccomp zsh-ccomp-install zsh-wcomp zsh-wcomp-install)\"" >> ~/.zshrc
 # Add aliases
 colorPrint "Set Aliases"
-echo "export EDITOR = micro"
+echo "export EDITOR = micro" >> ~/.zshrc
 echo "alias fh=\"find . -name\"" >> ~/.zshrc
 echo "alias t=\"tree -C -h\"" >> ~/.zshrc
 echo "alias m=\"micro\"" >> ~/.zshrc
