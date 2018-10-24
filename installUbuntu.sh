@@ -68,11 +68,11 @@ cp ~/tempfilezshrc ~/.zshrc
 rm ~/tempfilezshrc
 # Add plugins
 colorPrint "Installing fzf ..."
-git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
-~/.fzf/install
+git clone https://github.com/junegunn/fzf.git ~/.oh-my-zsh/custom/plugins/fzf
+~/.oh-my-zsh/custom/plugins/install
 colorPrint "Install plugins"
-git clone https://github.com/Treri/fzf-zsh.git ${ZSH}/custom/plugins/fzf-zsh
-git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH}/plugins/zsh-autosuggestions
+git clone https://github.com/Treri/fzf-zsh.git ~/.oh-my-zsh/custom/plugins/fzf-zsh
+git clone https://github.com/zsh-users/zsh-autosuggestions ~/.oh-my-zsh/plugins/zsh-autosuggestions
 sed 's,^plugins=(,plugins=(brew git gitfast mvn zsh-autosuggestions fzf-zsh docker last-working-dir colored-man-pages colorize,' ~/.zshrc > ~/tempfilezshrc
 cp ~/tempfilezshrc ~/.zshrc
 rm ~/tempfilezshrc
