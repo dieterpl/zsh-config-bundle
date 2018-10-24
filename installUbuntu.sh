@@ -34,31 +34,30 @@ fi
 # Install Brew
 # Install apps
 colorPrint "Installing ZSH ..."
-sudo apt-get install zsh
+sudo apt-get -y install zsh
 colorPrint "Installing tree ..."
-sudo apt-get install tree
+sudo apt-get -y install tree
 colorPrint "Installing exa ..."
 curl -Lo exa.zip "https://github.com/ogham/exa/releases/download/v0.8.0/exa-linux-x86_64-0.8.0.zip"
-unzip exa.zip -d "./"
+unzip -o exa.zip -d "./"
 rm -f exa.zip
 sudo mv exa-linux-x86_64 /usr/exa
 rm -rf exa-linux-x86_64
 colorPrint "Installing fasd ..."
 curl -Lo fasd.zip "https://github.com/clvv/fasd/zipball/1.0.1"
-unzip fasd.zip -d "./"
+unzip -o fasd.zip -d "./"
 rm -f fasd.zip
 sudo mv clvv-fasd-4822024/fasd /usr/fasd
-rm -rfclvv-fasd-4822024
+rm -rf clvv-fasd-4822024
 colorPrint "Installing micro ..."
 curl https://getmic.ro | bash
-colorPrint "Installing fzf ..."
-git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
-~/.fzf/install
+
+
 #$(brew --prefix)/opt/fzf/install < dev/null
 # Install oh-my-zsh
-export ZSH=~/.oh-my-zsh
 colorPrint "Installing oh-my-zsh ..."
 sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)" < /dev/null
+export ZSH=~/.oh-my-zsh
 cp "$ZSH"/templates/zshrc.zsh-template ~/.zshrc
 # Set Theme
 colorPrint "Setting Theme"
@@ -66,18 +65,19 @@ sed 's,ZSH_THEME=[^;]*,ZSH_THEME=muse,' ~/.zshrc > ~/tempfilezshrc
 cp ~/tempfilezshrc ~/.zshrc
 rm ~/tempfilezshrc
 # Add plugins
+colorPrint "Installing fzf ..."
+git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
+~/.fzf/install
 colorPrint "Install plugins"
-git clone https://github.com/junegunn/fzf.git ${ZSH}/custom/plugins/fzf
-${ZSH}/custom/plugins/fzf/install --bin
 git clone https://github.com/Treri/fzf-zsh.git ${ZSH}/custom/plugins/fzf-zsh
 git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH}/plugins/zsh-autosuggestions
-sed 's,^plugins=(,plugins=(brew git gitfast mvn zsh-autosuggestions fzf-zsh docker iterm2 last-working-dir colored-man-pages colorize,' ~/.zshrc > ~/tempfilezshrc
+sed 's,^plugins=(,plugins=(brew git gitfast mvn zsh-autosuggestions fzf-zsh docker last-working-dir colored-man-pages colorize,' ~/.zshrc > ~/tempfilezshrc
 cp ~/tempfilezshrc ~/.zshrc
 rm ~/tempfilezshrc
 echo "eval \"\$(fasd --init auto zsh-hook zsh-ccomp zsh-ccomp-install zsh-wcomp zsh-wcomp-install)\"" >> ~/.zshrc
 # Add aliases
 colorPrint "Set Aliases"
-echo "export EDITOR = micro" >> ~/.zshrc
+echo "export EDITOR=micro" >> ~/.zshrc
 echo "alias fh=\"find . -name\"" >> ~/.zshrc
 echo "alias t=\"tree -C -h\"" >> ~/.zshrc
 echo "alias m=\"micro\"" >> ~/.zshrc
