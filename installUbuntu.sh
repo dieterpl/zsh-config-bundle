@@ -33,6 +33,8 @@ if [ -f ~/.zshrc ] || [ -h ~/.zshrc ]; then
 fi
 # Install Brew
 # Install apps
+colorPrint "Installing Git ..."
+sudo apt-get -y install git
 colorPrint "Installing ZSH ..."
 sudo apt-get -y install zsh
 colorPrint "Installing tree ..."
