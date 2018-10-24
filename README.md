@@ -19,4 +19,10 @@ Furthermore a few handy aliases are created, check .zshrc or install.sh
 
 To install download the install script or use curl:
 
-`sh -c "$(curl -fsSL https://raw.githubusercontent.com/dieterpl/prime-shell/master/install.sh)"`
+## MacOs
+
+`sh -c "$(curl -fsSL https://raw.githubusercontent.com/dieterpl/zsh-config-bundle/master/installMac.sh)"`
+
+## Ubuntu
+
+`sh -c "$(curl -fsSL https://raw.githubusercontent.com/dieterpl/zsh-config-bundle/master/installUbuntu.sh)"`
