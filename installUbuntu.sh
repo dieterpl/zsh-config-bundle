@@ -60,7 +60,7 @@ sudo mv micro /usr/bin/micro
 colorPrint "Installing oh-my-zsh ..."
 sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)" < /dev/null
 export ZSH=~/.oh-my-zsh
-cp "$ZSH"/templates/zshrc.zsh-template ~/.zshrc
+cp ~/.oh-my-zsh/templates/zshrc.zsh-template ~/.zshrc
 # Set Theme
 colorPrint "Setting Theme"
 sed 's,ZSH_THEME=[^;]*,ZSH_THEME=muse,' ~/.zshrc > ~/tempfilezshrc
@@ -79,6 +79,7 @@ rm ~/tempfilezshrc
 echo "eval \"\$(fasd --init auto zsh-hook zsh-ccomp zsh-ccomp-install zsh-wcomp zsh-wcomp-install)\"" >> ~/.zshrc
 # Add aliases
 colorPrint "Set Aliases"
+echo "export ZSH=~/.oh-my-zsh"  >> ~/.zshrc
 echo "export EDITOR=micro" >> ~/.zshrc
 echo "alias fh=\"find . -name\"" >> ~/.zshrc
 echo "alias t=\"tree -C -h\"" >> ~/.zshrc
