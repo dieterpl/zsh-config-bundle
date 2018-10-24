@@ -43,17 +43,17 @@ colorPrint "Installing exa ..."
 curl -Lo exa.zip "https://github.com/ogham/exa/releases/download/v0.8.0/exa-linux-x86_64-0.8.0.zip"
 unzip -o exa.zip -d "./"
 rm -f exa.zip
-sudo mv exa-linux-x86_64 /usr/exa
+sudo mv exa-linux-x86_64 /usr/bin/exa
 rm -rf exa-linux-x86_64
 colorPrint "Installing fasd ..."
 curl -Lo fasd.zip "https://github.com/clvv/fasd/zipball/1.0.1"
 unzip -o fasd.zip -d "./"
 rm -f fasd.zip
-sudo mv clvv-fasd-4822024/fasd /usr/fasd
+sudo mv clvv-fasd-4822024/fasd /usr/bin/fasd
 rm -rf clvv-fasd-4822024
 colorPrint "Installing micro ..."
 curl https://getmic.ro | bash
-
+sudo mv micro /usr/bin/micro
 
 #$(brew --prefix)/opt/fzf/install < dev/null
 # Install oh-my-zsh
