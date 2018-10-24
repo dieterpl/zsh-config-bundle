@@ -1,6 +1,6 @@
 ![ps](https://github.com/dieterpl/prime-shell-bundle/raw/master/ps.png)
 
-This is a shell bundle based on oh-my-zsh for macOS. This is a complete ready to use bundle optimized for performance and usability.
+This is a shell bundle based on oh-my-zsh for macOS and Ubuntu. This is a complete ready to use bundle optimized for performance and usability.
 
 # Features
 
