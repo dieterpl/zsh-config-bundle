@@ -34,11 +34,11 @@ fi
 # Install Brew
 # Install apps
 colorPrint "Installing Git ..."
-sudo apt-get -y install git
+sudo pacman -Sy --noconfirm install git
 colorPrint "Installing ZSH ..."
-sudo apt-get -y install zsh
+sudo pacman -Sy --noconfirm install zsh
 colorPrint "Installing tree ..."
-sudo apt-get -y install tree
+sudo pacman -Sy --noconfirm install tree
 colorPrint "Installing exa ..."
 curl -Lo exa.zip "https://github.com/ogham/exa/releases/download/v0.8.0/exa-linux-x86_64-0.8.0.zip"
 unzip -o exa.zip -d "./"
@@ -73,7 +73,7 @@ git clone https://github.com/junegunn/fzf.git ~/.oh-my-zsh/custom/plugins/fzf
 colorPrint "Install plugins"
 git clone https://github.com/Treri/fzf-zsh.git ~/.oh-my-zsh/custom/plugins/fzf-zsh
 git clone https://github.com/zsh-users/zsh-autosuggestions ~/.oh-my-zsh/plugins/zsh-autosuggestions
-sed 's,^plugins=(,plugins=(git gitfast mvn fzf-zsh docker last-working-dir colored-man-pages colorize,' ~/.zshrc > ~/tempfilezshrc
+sed 's,^plugins=(,plugins=(git gitfast mvn fzf-zsh docker last-working-dir colored-man-pages colorize, ' ~/.zshrc > ~/tempfilezshrc
 cp ~/tempfilezshrc ~/.zshrc
 rm ~/tempfilezshrc
 echo "eval \"\$(fasd --init auto zsh-hook zsh-ccomp zsh-ccomp-install zsh-wcomp zsh-wcomp-install)\"" >> ~/.zshrc
