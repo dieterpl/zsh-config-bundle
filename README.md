@@ -26,3 +26,9 @@ To install download the install script or use curl:
 ## Ubuntu
 
 `sh -c "$(curl -fsSL https://raw.githubusercontent.com/dieterpl/zsh-config-bundle/master/installUbuntu.sh)"`
+
+
+## Arch
+
+`sh -c "$(curl -fsSL https://raw.githubusercontent.com/dieterpl/zsh-config-bundle/master/installArch.sh)"`
+
