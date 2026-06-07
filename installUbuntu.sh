@@ -1,12 +1,11 @@
-#!/bin/sh
-colorPrint(){
-    printf "${BLUE}"
-    echo "$1"
-    printf "${NORMAL}"
-}
-colorSetup(){
-      if which tput >/dev/null 2>&1; then
-      ncolors=$(tput colors)
+#!/bin/bash
+set -e
+
+# ── Color helpers ─────────────────────────────────────────────────────────────
+
+colorSetup() {
+  if which tput >/dev/null 2>&1; then
+    ncolors=$(tput colors)
   fi
   if [ -t 1 ] && [ -n "$ncolors" ] && [ "$ncolors" -ge 8 ]; then
     RED="$(tput setaf 1)"
@@ -16,77 +15,156 @@ colorSetup(){
     BOLD="$(tput bold)"
     NORMAL="$(tput sgr0)"
   else
-    RED=""
-    GREEN=""
-    YELLOW=""
-    BLUE=""
-    BOLD=""
-    NORMAL=""
+    RED="" GREEN="" YELLOW="" BLUE="" BOLD="" NORMAL=""
   fi
 }
 
-colorSetup
-colorPrint "Backing up zshrc"
-if [ -f ~/.zshrc ] || [ -h ~/.zshrc ]; then
-    printf "${YELLOW}Found ~/.zshrc.${NORMAL} ${GREEN}Backing up to ~/.zshrc.backup${NORMAL}\n";
-    mv ~/.zshrc ~/.zshrc.backup;
-fi
-# Install Brew
-# Install apps
-colorPrint "Installing Git ..."
-sudo apt-get -y install git
-colorPrint "Installing ZSH ..."
-sudo apt-get -y install zsh
-colorPrint "Installing tree ..."
-sudo apt-get -y install tree
-colorPrint "Installing exa ..."
-curl -Lo exa.zip "https://github.com/ogham/exa/releases/download/v0.8.0/exa-linux-x86_64-0.8.0.zip"
-unzip -o exa.zip -d "./"
-rm -f exa.zip
-sudo mv exa-linux-x86_64 /usr/bin/exa
-rm -rf exa-linux-x86_64
-colorPrint "Installing fasd ..."
-curl -Lo fasd.zip "https://github.com/clvv/fasd/zipball/1.0.1"
-unzip -o fasd.zip -d "./"
-rm -f fasd.zip
-sudo mv clvv-fasd-4822024/fasd /usr/bin/fasd
-rm -rf clvv-fasd-4822024
-colorPrint "Installing micro ..."
-curl https://getmic.ro | bash
-sudo mv micro /usr/bin/micro
+info()    { printf "${BLUE}  →  %s${NORMAL}\n" "$1"; }
+success() { printf "${GREEN}  ✓  %s${NORMAL}\n" "$1"; }
+warn()    { printf "${YELLOW}  !  %s${NORMAL}\n" "$1"; }
+error()   { printf "${RED}  ✗  %s${NORMAL}\n" "$1" >&2; }
 
-#$(brew --prefix)/opt/fzf/install < dev/null
-# Install oh-my-zsh
-colorPrint "Installing oh-my-zsh ..."
-sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)" < /dev/null
-export ZSH=~/.oh-my-zsh
-cp ~/.oh-my-zsh/templates/zshrc.zsh-template ~/.zshrc
-# Set Theme
-colorPrint "Setting Theme"
-sed 's,ZSH_THEME=[^;]*,ZSH_THEME=muse,' ~/.zshrc > ~/tempfilezshrc
-cp ~/tempfilezshrc ~/.zshrc
-rm ~/tempfilezshrc
-# Add plugins
-colorPrint "Installing fzf ..."
-git clone https://github.com/junegunn/fzf.git ~/.oh-my-zsh/custom/plugins/fzf
-~/.oh-my-zsh/custom/plugins/fzf/install
-colorPrint "Install plugins"
-git clone https://github.com/Treri/fzf-zsh.git ~/.oh-my-zsh/custom/plugins/fzf-zsh
-git clone https://github.com/zsh-users/zsh-autosuggestions ~/.oh-my-zsh/plugins/zsh-autosuggestions
-sed 's,^plugins=(,plugins=(git gitfast mvn fzf-zsh docker last-working-dir colored-man-pages colorize,' ~/.zshrc > ~/tempfilezshrc
-cp ~/tempfilezshrc ~/.zshrc
-rm ~/tempfilezshrc
-echo "eval \"\$(fasd --init auto zsh-hook zsh-ccomp zsh-ccomp-install zsh-wcomp zsh-wcomp-install)\"" >> ~/.zshrc
-# Add aliases
-colorPrint "Set Aliases"
-echo "export ZSH=~/.oh-my-zsh"  >> ~/.zshrc
-echo "export EDITOR=micro" >> ~/.zshrc
-echo "alias fh=\"find . -name\"" >> ~/.zshrc
-echo "alias t=\"tree -C -h\"" >> ~/.zshrc
-echo "alias m=\"micro\"" >> ~/.zshrc
-echo "alias l=\"exa -luabgU --git --time-style default -s type\"" >> ~/.zshrc
-echo "alias c=\"fasd_cd -d\"" >> ~/.zshrc
-echo "alias mm=\"fasd -e micro --f\"" >> ~/.zshrc
-echo "alias mmm\"fasd -e micro -i\"" >> ~/.zshrc
-colorPrint "Changing Shell (admin)"
-chsh -s $(which zsh)
+# ── Step functions ────────────────────────────────────────────────────────────
+
+backupZshrc() {
+  if [ -f ~/.zshrc ] || [ -h ~/.zshrc ]; then
+    warn "Existing ~/.zshrc found — backing up to ~/.zshrc.backup"
+    mv ~/.zshrc ~/.zshrc.backup
+  fi
+}
+
+installPackages() {
+  info "Updating package list"
+  sudo apt-get update -y
+
+  info "Installing base packages via apt"
+  sudo apt-get install -y git zsh tree fzf ripgrep
+
+  # bat is named batcat on Ubuntu due to naming conflict; create a symlink
+  sudo apt-get install -y bat
+  if command -v batcat &>/dev/null && ! command -v bat &>/dev/null; then
+    sudo ln -sf "$(which batcat)" /usr/local/bin/bat
+  fi
+
+  # fd is named fd-find on Ubuntu due to naming conflict; create a symlink
+  sudo apt-get install -y fd-find
+  if command -v fdfind &>/dev/null && ! command -v fd &>/dev/null; then
+    sudo ln -sf "$(which fdfind)" /usr/local/bin/fd
+  fi
+
+  # micro editor
+  info "Installing micro"
+  curl https://getmic.ro | bash
+  sudo mv micro /usr/local/bin/micro
+  success "micro installed"
+
+  # eza — modern ls (maintained fork of archived exa)
+  info "Installing eza"
+  sudo mkdir -p /etc/apt/keyrings
+  wget -qO- https://raw.githubusercontent.com/eza-community/eza/main/deb.asc \
+    | sudo gpg --dearmor -o /etc/apt/keyrings/gierens.gpg
+  echo "deb [signed-by=/etc/apt/keyrings/gierens.gpg] http://deb.gierens.de stable main" \
+    | sudo tee /etc/apt/sources.list.d/gierens.list
+  sudo chmod 644 /etc/apt/keyrings/gierens.gpg /etc/apt/sources.list.d/gierens.list
+  sudo apt-get update -y
+  sudo apt-get install -y eza
+  success "eza installed"
+
+  # zoxide — smart cd replacement for fasd
+  info "Installing zoxide"
+  curl -sSfL https://raw.githubusercontent.com/ajeetdsouza/zoxide/main/install.sh | sh
+  sudo mv ~/.local/bin/zoxide /usr/local/bin/zoxide 2>/dev/null || true
+  success "zoxide installed"
+}
+
+installOhMyZsh() {
+  export ZSH="$HOME/.oh-my-zsh"
+  info "Installing oh-my-zsh"
+  RUNZSH=no CHSH=no sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+  success "oh-my-zsh installed"
+}
+
+installPlugins() {
+  local target="${ZSH}/custom/plugins/zsh-autosuggestions"
+  if [[ -d "$target" ]]; then
+    warn "zsh-autosuggestions already cloned — skipping"
+  else
+    info "Cloning zsh-autosuggestions"
+    git clone https://github.com/zsh-users/zsh-autosuggestions "$target"
+    success "zsh-autosuggestions cloned"
+  fi
+}
+
+configureZshrc() {
+  info "Setting theme to muse"
+  sed 's,ZSH_THEME=[^;]*,ZSH_THEME="muse",' ~/.zshrc > ~/tempfilezshrc
+  mv ~/tempfilezshrc ~/.zshrc
+
+  info "Setting plugins"
+  sed 's,^plugins=(.*,plugins=(git fzf zoxide zsh-autosuggestions colored-man-pages colorize last-working-dir),' ~/.zshrc > ~/tempfilezshrc
+  mv ~/tempfilezshrc ~/.zshrc
+
+  info "Appending custom config"
+  cat >> ~/.zshrc << 'ZSHRC_EOF'
+
+# ── Custom config ─────────────────────────────────────────────────────────────
+
+export ZSH="$HOME/.oh-my-zsh"
+export EDITOR=micro
+
+alias fh='find . -name'
+alias t='tree -C -h'
+alias m='micro'
+alias l='eza -luabgU --git --time-style=relative -s type'
+alias c='z'
+alias mm='micro "$(fzf --preview="bat --color=always {}")"'
+alias mmm='micro "$(fd --type f | fzf --preview="bat --color=always {}")"'
+ZSHRC_EOF
+
+  success ".zshrc configured"
+}
+
+changeDefaultShell() {
+  if [[ "$(basename "$SHELL")" == "zsh" ]]; then
+    info "zsh is already the default shell — skipping"
+  else
+    info "Changing default shell to zsh (may prompt for password)"
+    chsh -s "$(which zsh)"
+    success "Default shell changed to zsh"
+  fi
+}
+
+verify() {
+  printf "\n${BOLD}── Verification ───────────────────────────────────────────${NORMAL}\n"
+  local pass=0 fail=0
+  check_cmd() {
+    if command -v "$1" &>/dev/null; then
+      success "$1"
+      ((pass++))
+    else
+      error "$1 not found"
+      ((fail++))
+    fi
+  }
+  check_cmd zsh; check_cmd eza; check_cmd zoxide; check_cmd fzf
+  check_cmd micro; check_cmd bat; check_cmd fd; check_cmd rg
+
+  [[ -d "$HOME/.oh-my-zsh" ]] && { success "oh-my-zsh exists"; ((pass++)); } || { error "oh-my-zsh missing"; ((fail++)); }
+  [[ -d "${ZSH}/custom/plugins/zsh-autosuggestions" ]] && { success "zsh-autosuggestions cloned"; ((pass++)); } || { error "zsh-autosuggestions missing"; ((fail++)); }
+
+  printf "\n${BOLD}%d passed, %d failed${NORMAL}\n" "$pass" "$fail"
+  printf "\n${BOLD}Run: exec zsh${NORMAL} to apply all changes\n"
+}
+
+# ── Main ──────────────────────────────────────────────────────────────────────
+
+colorSetup
+printf "\n${BOLD}── zsh-config-bundle installer (Ubuntu) ────────────────────${NORMAL}\n\n"
+
+backupZshrc
+installPackages
+installOhMyZsh
+installPlugins
+configureZshrc
+changeDefaultShell
+verify
